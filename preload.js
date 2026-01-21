@@ -1,16 +1,10 @@
 function doStuff(window) {
     var params = new URLSearchParams(window.location.search)
-    var username = params.get("username")
-    var uid = params.get("id")
     var url = params.get("url")
-    if (username === null || uid === null || url === null) {
+    if (url === null) {
         document.body.innerHTML = "Stop joking with me."
         return
     }
-
-    // Set username and ID
-    document.head.getElementsByTagName("title")[0].textContent = `${username} (ID: ${uid})`
-    document.body.getElementsByClassName("info__user")[0].textContent = `Transcript: ${username} (ID: ${uid})`
 
     // Load JSON from URL
     try {
@@ -18,12 +12,19 @@ function doStuff(window) {
             try {
                 return res.json()
             } catch (error) { 
-                document.body.innerHTML = "Fucked up URL."
+                document.body.innerHTML = "Fucked up URL."  // this never worked
                 Promise.reject()
             }
-        }).then(json => { fillOut(json) })
+        }).then(json => { 
+            // Set username and ID
+            var username = json[0].author.username
+            var uid = json[0].author.id
+            document.head.getElementsByTagName("title")[0].textContent = `${username} (ID: ${uid})`
+            document.body.getElementsByClassName("info__user")[0].textContent = `Transcript: ${username} (ID: ${uid})`
+            fillOut(json) 
+        })
     } catch (error) {
-        document.body.innerHTML = "Fucked up URL."
+        document.body.innerHTML = "Fucked up URL."  // this never worked
         return;
     }
 }
