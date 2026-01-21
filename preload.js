@@ -14,7 +14,7 @@ function doStuff(window) {
 
     // Load JSON from URL
     try {
-        fetch(url).then(res => { return res.json() }).then(json => { fillOut(json) })
+        fetch(`https://corsproxy.io/?url=${url}`).then(res => { return res.json() }).then(json => { fillOut(json) })
     } catch (error) {
         document.body.innerHTML = "Fucked up URL."
         return;
