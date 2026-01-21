@@ -14,7 +14,7 @@ function doStuff(window) {
 
     // Load JSON from URL
     try {
-        fetch(`https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(url)}`).then(res => {
+        fetch(`https://api.codetabs.com/v1/proxy/?quest=${url}`).then(res => {
             try {
                 return res.json()
             } catch (error) { 
