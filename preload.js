@@ -14,14 +14,21 @@ function doStuff(window) {
 
     // Load JSON from URL
     try {
-        fetch(`https://corsproxy.io/?url=${url}`).then(res => { return res.json() }).then(json => { fillOut(json) })
+        fetch(`https://corsproxy.io/?url=${url}`).then(res => {
+            try {
+                return res.json()
+            } catch (error) { 
+                document.body.innerHTML = "Fucked up URL."
+                Promise.reject()
+            }
+        }).then(json => { fillOut(json) })
     } catch (error) {
         document.body.innerHTML = "Fucked up URL."
         return;
     }
 }
 
-function appendChild(target, insert){
+function appendChild(target, insert) {
     Array.from(insert.body.children).forEach(element => {
         target.appendChild(element)
     });
@@ -123,25 +130,25 @@ function fillOut(messages) {
 
 }
 
-function b64toBlob (b64Data, contentType='', sliceSize=512) {
+function b64toBlob(b64Data, contentType = '', sliceSize = 512) {
     const byteCharacters = atob(b64Data);
     const byteArrays = [];
-  
+
     for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-      const slice = byteCharacters.slice(offset, offset + sliceSize);
-  
-      const byteNumbers = new Array(slice.length);
-      for (let i = 0; i < slice.length; i++) {
-        byteNumbers[i] = slice.charCodeAt(i);
-      }
-  
-      const byteArray = new Uint8Array(byteNumbers);
-      byteArrays.push(byteArray);
+        const slice = byteCharacters.slice(offset, offset + sliceSize);
+
+        const byteNumbers = new Array(slice.length);
+        for (let i = 0; i < slice.length; i++) {
+            byteNumbers[i] = slice.charCodeAt(i);
+        }
+
+        const byteArray = new Uint8Array(byteNumbers);
+        byteArrays.push(byteArray);
     }
-      
-    const blob = new Blob(byteArrays, {type: contentType});
+
+    const blob = new Blob(byteArrays, { type: contentType });
     return blob;
-  }
+}
 
 function getMimeTypeFromExtension(extension = "txt") {
     if (extension[0] === ".") {
