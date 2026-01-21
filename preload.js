@@ -77,6 +77,7 @@ function fillOut(messages) {
                 var blob = b64toBlob(file.content, getMimeTypeFromExtension(file.name.split(".").pop()))
                 var url = URL.createObjectURL(blob)
                 base.getElementsByTagName("a")[0].href = url
+                base.getElementsByTagName("a")[0].download = file.name
                 appendChild(inner.getElementsByClassName("chatlog__message")[0], base)
             }
             else if (video_types.includes(file.name.split(".").pop())) {
@@ -120,6 +121,7 @@ function fillOut(messages) {
                 var url = URL.createObjectURL(blob)
                 base.getElementsByTagName("a")[0].href = url
                 base.getElementsByTagName("a")[0].textContent = file.name
+                base.getElementsByTagName("a")[0].download = file.name
                 appendChild(inner.getElementsByClassName("chatlog__message")[0], base)
             }
         });
