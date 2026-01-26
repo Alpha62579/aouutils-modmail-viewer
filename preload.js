@@ -1,37 +1,51 @@
 function doStuff(window) {
     const params = new URLSearchParams(window.location.search)
-    const url = params.get("url")
+    const urls = []
+    
+    for (let i = 1; params.has(`url${i}`); i++) {
+        urls.push(params.get(`url${i}`))
+    }
 
-    if (!url) {
+    if (urls.length === 0) {
         document.body.innerHTML = "Transcript not provided"
         return
     }
 
-    fetch(`https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(url)}`)
-        .then(res => {
-            if (!res.ok) {
-                throw new Error(`HTTP error ${res.status}`)
-            }
-            return res.json()
-        })
-        .then(json => {
-            if (!Array.isArray(json) || !json[0]?.author) {
-                throw new Error("Invalid JSON structure")
-            }
+    Promise.all(urls.map(url =>
+        fetch(`https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(url)}`)
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`HTTP error ${res.status}`)
+                }
+                return res.json()
+            })
+    ))
+    .then(results => {
+        // Validate all results are arrays
+        if (!results.every(result => Array.isArray(result))) {
+            throw new Error("Invalid JSON structure")
+        }
 
-            const username = json[0].author.username
-            const uid = json[0].author.id
+        // Flatten all message arrays into one
+        const allMessages = results.flat()
 
-            document.title = `${username} (ID: ${uid})`
-            document.getElementsByClassName("info__user")[0].textContent =
-                `Transcript: ${username} (ID: ${uid})`
+        if (allMessages.length === 0 || !allMessages[0]?.author) {
+            throw new Error("No valid messages found")
+        }
 
-            fillOut(json)
-        })
-        .catch(err => {
-            console.error(err)
-            document.body.innerHTML = "Fucked up URL."
-        })
+        const username = allMessages[0].author.username
+        const uid = allMessages[0].author.id
+
+        document.title = `${username} (ID: ${uid})`
+        document.getElementsByClassName("info__user")[0].textContent =
+            `Transcript: ${username} (ID: ${uid})`
+
+        fillOut(allMessages)
+    })
+    .catch(err => {
+        console.error(err)
+        document.body.innerHTML = "Fucked up URL."
+    })
 }
 
 function appendChild(target, insert) {
