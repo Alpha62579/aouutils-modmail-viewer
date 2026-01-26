@@ -22,8 +22,6 @@ function doStuff(window) {
         return
     }
 
-    document.body.innerHTML = 'Loading transcripts...'
-
     Promise.all(urls.map(url =>
         fetch(`https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(url)}`)
             .then(res => {
