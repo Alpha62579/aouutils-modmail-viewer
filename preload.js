@@ -83,6 +83,7 @@ function fillOut(messages) {
         appendChild(inner.getElementsByClassName("chatlog__message")[0], content)
 
         msg.embeds.forEach(embed => {
+            if (embed.type !== "rich") return;
             var e_base = parser.parseFromString(embed_base, "text/html")
             e_base.getElementsByClassName("chatlog__embed-color-pill")[0].setAttribute("style", `background-color: #${embed.color.toString(16).padStart(6, '0')}`)
             // prolly implement authors
