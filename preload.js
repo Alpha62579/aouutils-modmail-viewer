@@ -1,32 +1,37 @@
 function doStuff(window) {
-    var params = new URLSearchParams(window.location.search)
-    var url = params.get("url")
-    if (url === null) {
-        document.body.innerHTML = "Stop joking with me."
+    const params = new URLSearchParams(window.location.search)
+    const url = params.get("url")
+
+    if (!url) {
+        document.body.innerHTML = "Transcript not provided"
         return
     }
 
-    // Load JSON from URL
-    try {
-        fetch(`https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(url)}`).then(res => {
-            try {
-                return res.json()
-            } catch (error) { 
-                document.body.innerHTML = "Fucked up URL."  // this never worked
-                Promise.reject()
+    fetch(`https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(url)}`)
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`HTTP error ${res.status}`)
             }
-        }).then(json => { 
-            // Set username and ID
-            var username = json[0].author.username
-            var uid = json[0].author.id
-            document.head.getElementsByTagName("title")[0].textContent = `${username} (ID: ${uid})`
-            document.body.getElementsByClassName("info__user")[0].textContent = `Transcript: ${username} (ID: ${uid})`
-            fillOut(json) 
+            return res.json()
         })
-    } catch (error) {
-        document.body.innerHTML = "Fucked up URL."  // this never worked
-        return;
-    }
+        .then(json => {
+            if (!Array.isArray(json) || !json[0]?.author) {
+                throw new Error("Invalid JSON structure")
+            }
+
+            const username = json[0].author.username
+            const uid = json[0].author.id
+
+            document.title = `${username} (ID: ${uid})`
+            document.getElementsByClassName("info__user")[0].textContent =
+                `Transcript: ${username} (ID: ${uid})`
+
+            fillOut(json)
+        })
+        .catch(err => {
+            console.error(err)
+            document.body.innerHTML = "Fucked up URL."
+        })
 }
 
 function appendChild(target, insert) {
