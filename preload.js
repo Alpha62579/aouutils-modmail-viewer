@@ -1,10 +1,14 @@
 function doStuff(window) {
     const params = new URLSearchParams(window.location.search)
-    const urls = []
+    const allUrls = []
+    const expectedPrefix = "https://cdn.discordapp.com/attachments/1333171543357784146/"
     
     for (let i = 1; params.has(`url${i}`); i++) {
-        urls.push(params.get(`url${i}`))
+        allUrls.push(params.get(`url${i}`))
     }
+
+    // Filter to only valid URLs
+    const urls = allUrls.filter(url => url.startsWith(expectedPrefix))
 
     if (urls.length === 0) {
         document.body.innerHTML = "Transcript not provided"
