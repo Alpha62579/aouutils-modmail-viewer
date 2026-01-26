@@ -1,10 +1,17 @@
 function doStuff(window) {
     const params = new URLSearchParams(window.location.search)
-    const allUrls = []
     const expectedPrefix = "https://cdn.discordapp.com/attachments/1333171543357784146/"
     
-    for (let i = 1; params.has(`url${i}`); i++) {
-        allUrls.push(params.get(`url${i}`))
+    let allUrls = []
+    
+    // Check for legacy single "url" parameter
+    if (params.has("url")) {
+        allUrls.push(params.get("url"))
+    } else {
+        // Check for url1, url2, etc.
+        for (let i = 1; params.has(`url${i}`); i++) {
+            allUrls.push(params.get(`url${i}`))
+        }
     }
 
     // Filter to only valid URLs
