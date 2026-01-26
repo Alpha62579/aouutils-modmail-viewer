@@ -55,7 +55,7 @@ function doStuff(window) {
     })
     .catch(err => {
         console.error(err)
-        document.body.innerHTML = "Fucked up URL."
+        document.body.innerHTML = "Invalid transcript data"
     })
 }
 
