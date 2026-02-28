@@ -109,6 +109,7 @@ function fillOut(messages) {
                 var url = URL.createObjectURL(blob)
                 base.getElementsByTagName("a")[0].href = url
                 base.getElementsByTagName("a")[0].download = file.name
+                base.getElementsByTagName("a")[0].getElementsByTagName("img")[0].src = url
                 appendChild(inner.getElementsByClassName("chatlog__message")[0], base)
             }
             else if (video_types.includes(file.name.split(".").pop())) {
