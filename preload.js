@@ -84,6 +84,13 @@ function fillOut(messages) {
 
         msg.embeds.forEach(embed => {
             if (embed.type !== "rich") return;
+
+            // this is probably AOUutils, replace with AOUutils' profile.
+            starter.getElementsByTagName("img")[0].src = "https://cdn.discordapp.com/avatars/850025674093494303/028cfbf118ed2c90d58df7f5bd86bf67.webp?size=128"
+            starter.getElementsByTagName("span")[0].title = "All Of Us Utilities"
+            starter.getElementsByTagName("span")[0].textContent = "All Of Us Utilities"
+            starter.getElementsByTagName("span")[0].setAttribute("data-user-id", "850025674093494303")
+            
             var e_base = parser.parseFromString(embed_base, "text/html")
             e_base.getElementsByClassName("chatlog__embed-color-pill")[0].setAttribute("style", `background-color: #${embed.color.toString(16).padStart(6, '0')}`)
             // prolly implement authors
