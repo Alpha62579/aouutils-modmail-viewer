@@ -92,7 +92,7 @@ function fillOut(messages) {
             starter.getElementsByTagName("span")[0].setAttribute("data-user-id", "850025674093494303")
             
             var e_base = parser.parseFromString(embed_base, "text/html")
-            e_base.getElementsByClassName("chatlog__embed-color-pill")[0].setAttribute("style", `background-color: #${embed.color.toString(16).padStart(6, '0')}`)
+            e_base.getElementsByClassName("chatlog__embed-color-pill")[0].setAttribute("style", `background-color: #${embed.color === undefined ? "000000" : embed.color.toString(16).padStart(6, '0')}`)
             // prolly implement authors
             if ('title' in embed) {
                 var title = parser.parseFromString(embed_title, "text/html")
