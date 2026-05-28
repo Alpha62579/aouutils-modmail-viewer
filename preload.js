@@ -177,8 +177,8 @@ function fillOutv2(transcript) {
 }
 
 function fillOutv1(messages) {
-    const username = allMessages[0].author.username
-    const uid = allMessages[0].author.id
+    const username = messages[0].author.username
+    const uid = messages[0].author.id
 
     document.title = `${username} (ID: ${uid})`
     document.getElementsByClassName("info__user")[0].textContent =
