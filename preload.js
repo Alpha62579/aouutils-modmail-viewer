@@ -156,7 +156,7 @@ function fillOutv2(transcript) {
                 else if (audio_types.includes(filename.split(".").pop())) {
                     var icon = "assets/discord-audio.svg"
                     var audio = parser.parseFromString(attachment_audio, "text/html")
-                    base.getElementsByTagName("source")[0].href = msg.files[filename]
+                    audio.getElementsByTagName("source")[0].href = msg.files[filename]
                     audio.getElementsByTagName("source")[0].title = filename
                     appendChild(base.getElementsByClassName("chatlog__attachment-ext-container")[0], audio)
                 }
@@ -265,7 +265,7 @@ function fillOutv1(messages) {
                     var audio = parser.parseFromString(attachment_audio, "text/html")
                     var blob = b64toBlob(file.content, getMimeTypeFromExtension(file.name.split(".").pop()))
                     var url = URL.createObjectURL(blob)
-                    base.getElementsByTagName("source")[0].href = url
+                    audio.getElementsByTagName("source")[0].href = url
                     audio.getElementsByTagName("source")[0].title = file.name
                     appendChild(base.getElementsByClassName("chatlog__attachment-ext-container")[0], audio)
                 }
