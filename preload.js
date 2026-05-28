@@ -1,6 +1,6 @@
 function doStuff(window) {
     const params = new URLSearchParams(window.location.search)
-    const expectedPrefixes = ["https://cdn.discordapp.com/attachments/1333171543357784146/", "https://cdn.discordapp.com/ephemeral_attachments/1333171543357784146/", "https://cdn.discordapp.com/attachments/1211643455927885875/", "https://cdn.discordapp.com/ephemeral_attachments/1211643455927885875/"]
+    const expectedPrefixes = ["https://cdn.discordapp.com/attachments/1333171543357784146/", "https://cdn.discordapp.com/ephemeral-attachments/1333171543357784146/", "https://cdn.discordapp.com/attachments/1211643455927885875/", "https://cdn.discordapp.com/ephemeral-attachments/1211643455927885875/"]
 
     let allUrls = []
 
