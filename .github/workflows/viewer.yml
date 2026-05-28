@@ -22,16 +22,18 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      # Clone it so that we can just copy-paste this workflow into the main repo if we wanted.
-      - name: Clone Repository
-        run: git clone https://github.com/Alpha62579/AOUutils-Modmail-Viewer
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
-          path: './AOUutils-Modmail-Viewer'
+          path: '.'
+
+          
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
