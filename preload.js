@@ -1,9 +1,9 @@
 function doStuff(window) {
     const params = new URLSearchParams(window.location.search)
-    const expectedPrefix = "https://cdn.discordapp.com/attachments/1333171543357784146/"
-    
+    const expectedPrefixes = ["https://cdn.discordapp.com/attachments/1333171543357784146/", "https://cdn.discordapp.com/ephemeral_attachments/1333171543357784146/", "https://cdn.discordapp.com/attachments/850668209148395520/", "https://cdn.discordapp.com/ephemeral_attachments/850668209148395520/"]
+
     let allUrls = []
-    
+
     // Check for legacy single "url" parameter
     if (params.has("url")) {
         allUrls.push(params.get("url"))
@@ -15,7 +15,7 @@ function doStuff(window) {
     }
 
     // Filter to only valid URLs
-    const urls = allUrls.filter(url => url.startsWith(expectedPrefix))
+    const urls = allUrls.filter(url => expectedPrefixes.some(prefix => url.startsWith(prefix)))
 
     if (urls.length === 0) {
         document.body.innerHTML = "Transcript not provided"
@@ -31,32 +31,40 @@ function doStuff(window) {
                 return res.json()
             })
     ))
-    .then(results => {
-        // Validate all results are arrays
-        if (!results.every(result => Array.isArray(result))) {
-            throw new Error("Invalid JSON structure")
-        }
+        .then(results => {
+            // Validate all results are arrays
+            if (results.every(result => Array.isArray(result))) {
+                // This is probably version 1, flatten and proceed.
 
-        // Flatten all message arrays into one
-        const allMessages = results.flat()
+                // Flatten all message arrays into one
+                const allMessages = results.flat()
 
-        if (allMessages.length === 0 || !allMessages[0]?.author) {
-            throw new Error("No valid messages found")
-        }
+                if (allMessages.length === 0 || !allMessages[0]?.author) {
+                    throw new Error("No valid messages found")
+                }
 
-        const username = allMessages[0].author.username
-        const uid = allMessages[0].author.id
+                fillOutv1(allMessages)
+                return;
+            }
 
-        document.title = `${username} (ID: ${uid})`
-        document.getElementsByClassName("info__user")[0].textContent =
-            `Transcript: ${username} (ID: ${uid})`
+            if (results.every(result => result.version == 2)) {
+                var flatTranscript = results[0];
+                results.slice(1).forEach(element => {
+                    flatTranscript.messages.concat(element.messages)
+                });
 
-        fillOut(allMessages)
-    })
-    .catch(err => {
-        console.error(err)
-        document.body.innerHTML = "Invalid transcript data"
-    })
+                fillOutv2(flatTranscript);
+                return;
+            }
+
+            document.body.innerHTML = "Invalid transcript data"
+
+
+        })
+        .catch(err => {
+            console.error(err)
+            document.body.innerHTML = "Invalid transcript data"
+        })
 }
 
 function appendChild(target, insert) {
@@ -65,7 +73,116 @@ function appendChild(target, insert) {
     });
 }
 
-function fillOut(messages) {
+function fillOutv2(transcript) {
+    const username = transcript.messages[0].author.username
+    const uid = transcript.messages[0].author.id
+
+    document.title = `${username} (ID: ${uid})`
+    document.getElementsByClassName("info__user")[0].textContent =
+        `Transcript: ${username} (ID: ${uid})`
+    document.body.getElementsByClassName("info__channel-message-count")[0].textContent = `${messages.length} messages`
+
+    const parser = new DOMParser();
+
+    transcript.messages.forEach(msg => {
+        var starter = parser.parseFromString(message_meta, "text/html")
+        starter.getElementsByTagName("img")[0].src = msg.author.avatar
+        starter.getElementsByTagName("span")[0].title = msg.author.username
+        starter.getElementsByTagName("span")[0].textContent = msg.author.username
+        starter.getElementsByTagName("span")[0].setAttribute("data-user-id", msg.author.id)
+
+        var inner = parser.parseFromString(message_base, "text/html")
+        var content = parser.parseFromString(message_content, "text/html")
+        content.getElementsByTagName("span")[0].textContent = msg.content
+        appendChild(inner.getElementsByClassName("chatlog__message")[0], content)
+
+        msg.embeds.forEach(embed => {
+            if (embed.type !== "rich") return;
+
+            // this is probably AOUutils, replace with AOUutils' profile.
+            starter.getElementsByTagName("img")[0].src = "https://cdn.discordapp.com/avatars/850025674093494303/028cfbf118ed2c90d58df7f5bd86bf67.webp?size=128"
+            starter.getElementsByTagName("span")[0].title = "Modmail"
+            starter.getElementsByTagName("span")[0].textContent = "Modmail"
+            starter.getElementsByTagName("span")[0].setAttribute("data-user-id", "850025674093494303")
+
+            var e_base = parser.parseFromString(embed_base, "text/html")
+            e_base.getElementsByClassName("chatlog__embed-color-pill")[0].setAttribute("style", `background-color: #${embed.color === undefined ? "000000" : embed.color.toString(16).padStart(6, '0')}`)
+            // prolly implement authors
+            if ('title' in embed) {
+                var title = parser.parseFromString(embed_title, "text/html")
+                title.getElementsByTagName("span")[0].textContent = embed.title
+                appendChild(e_base.getElementsByClassName("chatlog__embed-text")[0], title)
+            }
+            if ('description' in embed) {
+                var desc = parser.parseFromString(embed_description, "text/html")
+                desc.getElementsByTagName("span")[0].textContent = embed.description
+                appendChild(e_base.getElementsByClassName("chatlog__embed-text")[0], desc)
+            }
+            //implement fields, image, thumbnail and footer
+
+            appendChild(inner.getElementsByClassName("chatlog__message")[0], e_base)
+        });
+
+        Object.keys(msg.files).forEach(filename => {
+            if (image_types.includes(filename.split(".").pop())) {
+                var base = parser.parseFromString(attachment_base_image, "text/html")
+                base.getElementsByTagName("a")[0].href = msg.files[filename]
+                base.getElementsByTagName("a")[0].download = filename
+                base.getElementsByTagName("a")[0].getElementsByTagName("img")[0].src = msg.files[filename]
+                appendChild(inner.getElementsByClassName("chatlog__message")[0], base)
+            }
+            else if (video_types.includes(filename.split(".").pop())) {
+                var base = parser.parseFromString(attachment_base_video, "text/html")
+                base.getElementsByTagName("video")[0].src = msg.files[filename]
+                appendChild(inner.getElementsByClassName("chatlog__message")[0], base)
+            }
+            else {
+                var base = parser.parseFromString(attachment_base_file_audio, "text/html")
+                if (webcode_types.includes(filename.split(".").pop())) {
+                    var icon = "assets/discord-webcode.svg"
+                }
+                else if (code_types.includes(filename.split(".").pop())) {
+                    var icon = "assets/discord-code.svg"
+                }
+                else if (document_types.includes(filename.split(".").pop())) {
+                    var icon = "assets/discord-document.svg"
+                }
+                else if (acrobat_types.includes(filename.split(".").pop())) {
+                    var icon = "assets/discord-acrobat.svg"
+                }
+                else if (archive_types.includes(filename.split(".").pop())) {
+                    var icon = "assets/discord-archive.svg"
+                }
+                else if (audio_types.includes(filename.split(".").pop())) {
+                    var icon = "assets/discord-audio.svg"
+                    var audio = parser.parseFromString(attachment_audio, "text/html")
+                    base.getElementsByTagName("source")[0].href = msg.files[filename]
+                    audio.getElementsByTagName("source")[0].title = filename
+                    appendChild(base.getElementsByClassName("chatlog__attachment-ext-container")[0], audio)
+                }
+                else {
+                    var icon = "assets/discord-unknown.svg"
+                }
+                base.getElementsByTagName("img")[0].src = icon
+                base.getElementsByTagName("a")[0].href = msg.files[filename]
+                base.getElementsByTagName("a")[0].textContent = filename
+                base.getElementsByTagName("a")[0].download = filename
+                appendChild(inner.getElementsByClassName("chatlog__message")[0], base)
+            }
+        });
+
+        appendChild(starter.getElementsByClassName("chatlog__messages")[0], inner)
+        appendChild(document.getElementsByClassName("chatlog")[0], starter)
+    });
+}
+
+function fillOutv1(messages) {
+    const username = allMessages[0].author.username
+    const uid = allMessages[0].author.id
+
+    document.title = `${username} (ID: ${uid})`
+    document.getElementsByClassName("info__user")[0].textContent =
+        `Transcript: ${username} (ID: ${uid})`
     document.body.getElementsByClassName("info__channel-message-count")[0].textContent = `${messages.length} messages`
 
     const parser = new DOMParser();
@@ -90,7 +207,7 @@ function fillOut(messages) {
             starter.getElementsByTagName("span")[0].title = "All Of Us Utilities"
             starter.getElementsByTagName("span")[0].textContent = "All Of Us Utilities"
             starter.getElementsByTagName("span")[0].setAttribute("data-user-id", "850025674093494303")
-            
+
             var e_base = parser.parseFromString(embed_base, "text/html")
             e_base.getElementsByClassName("chatlog__embed-color-pill")[0].setAttribute("style", `background-color: #${embed.color === undefined ? "000000" : embed.color.toString(16).padStart(6, '0')}`)
             // prolly implement authors
