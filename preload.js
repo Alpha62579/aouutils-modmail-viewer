@@ -80,7 +80,7 @@ function fillOutv2(transcript) {
     document.title = `${username} (ID: ${uid})`
     document.getElementsByClassName("info__user")[0].textContent =
         `Transcript: ${username} (ID: ${uid})`
-    document.body.getElementsByClassName("info__channel-message-count")[0].textContent = `${messages.length} messages`
+    document.body.getElementsByClassName("info__channel-message-count")[0].textContent = `${transcript.messages.length} messages`
 
     const parser = new DOMParser();
 
