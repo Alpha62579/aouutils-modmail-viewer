@@ -23,7 +23,7 @@ function doStuff(window) {
     }
 
     Promise.all(urls.map(url =>
-        fetch(`https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(url)}`)
+        fetch(`https://corsproxy.io/?url=${encodeURIComponent(url)}`)
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`HTTP error ${res.status}`)
