@@ -23,7 +23,7 @@ function doStuff(window) {
     }
 
     Promise.all(urls.map(url =>
-        fetch(`https://summer-cherry-119d.robinium.workers.dev/?url=${encodeURIComponent(url)}`)
+        fetch(`https://cors.robinium.dpdns.org/?url=${encodeURIComponent(url)}`)
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`HTTP error ${res.status}`)
