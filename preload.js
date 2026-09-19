@@ -52,7 +52,7 @@ window.doStuff = function () {
             if (results.every(result => result.version == 2)) {
                 var flatTranscript = results[0];
                 results.slice(1).forEach(element => {
-                    flatTranscript.messages.concat(element.messages)
+                    flatTranscript.messages = flatTranscript.messages.concat(element.messages)
                 });
 
                 fillOutv2(flatTranscript);
