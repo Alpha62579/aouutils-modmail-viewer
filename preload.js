@@ -1,5 +1,7 @@
-function doStuff(window) {
-    const params = new URLSearchParams(window.location.search)
+import SimpleMarkdown from 'https://esm.sh/simple-markdown';
+
+window.doStuff = function () {
+    const params = new URLSearchParams(this.location.search)
     const expectedPrefixes = ["https://cdn.discordapp.com/attachments/1333171543357784146/", "https://cdn.discordapp.com/ephemeral-attachments/1333171543357784146/", "https://cdn.discordapp.com/attachments/1211643455927885875/", "https://cdn.discordapp.com/ephemeral-attachments/1211643455927885875/"]
 
     let allUrls = []
@@ -93,7 +95,7 @@ function fillOutv2(transcript) {
 
         var inner = parser.parseFromString(message_base, "text/html")
         var content = parser.parseFromString(message_content, "text/html")
-        content.getElementsByTagName("span")[0].textContent = msg.content
+        content.getElementsByTagName("span")[0].innerHTML = SimpleMarkdown.markdownToHtml(msg.content)
         appendChild(inner.getElementsByClassName("chatlog__message")[0], content)
 
         msg.embeds.forEach(embed => {
@@ -115,7 +117,7 @@ function fillOutv2(transcript) {
             }
             if ('description' in embed) {
                 var desc = parser.parseFromString(embed_description, "text/html")
-                desc.getElementsByTagName("span")[0].textContent = embed.description
+                desc.getElementsByTagName("span")[0].innerHTML = SimpleMarkdown.markdownToHtml(embed.description)
                 appendChild(e_base.getElementsByClassName("chatlog__embed-text")[0], desc)
             }
             //implement fields, image, thumbnail and footer
@@ -197,7 +199,7 @@ function fillOutv1(messages) {
 
         var inner = parser.parseFromString(message_base, "text/html")
         var content = parser.parseFromString(message_content, "text/html")
-        content.getElementsByTagName("span")[0].textContent = msg.content
+        content.getElementsByTagName("span")[0].innerHTML = SimpleMarkdown.markdownToHtml(msg.content)
         appendChild(inner.getElementsByClassName("chatlog__message")[0], content)
 
         msg.embeds.forEach(embed => {
@@ -219,7 +221,7 @@ function fillOutv1(messages) {
             }
             if ('description' in embed) {
                 var desc = parser.parseFromString(embed_description, "text/html")
-                desc.getElementsByTagName("span")[0].textContent = embed.description
+                desc.getElementsByTagName("span")[0].innerHTML = SimpleMarkdown.markdownToHtml(embed.description)
                 appendChild(e_base.getElementsByClassName("chatlog__embed-text")[0], desc)
             }
             //implement fields, image, thumbnail and footer
