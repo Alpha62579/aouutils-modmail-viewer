@@ -2,7 +2,14 @@ import SimpleMarkdown from 'https://esm.sh/simple-markdown';
 
 window.doStuff = function () {
     const params = new URLSearchParams(this.location.search)
-    const expectedPrefixes = ["https://cdn.discordapp.com/attachments/1333171543357784146/", "https://cdn.discordapp.com/ephemeral-attachments/1333171543357784146/", "https://cdn.discordapp.com/attachments/1211643455927885875/", "https://cdn.discordapp.com/ephemeral-attachments/1211643455927885875/"]
+    const expectedPrefixes = [
+        "https://cdn.discordapp.com/attachments/1333171543357784146/",
+        "https://cdn.discordapp.com/ephemeral-attachments/1333171543357784146/",
+        "https://cdn.discordapp.com/attachments/1211643455927885875/",
+        "https://cdn.discordapp.com/ephemeral-attachments/1211643455927885875/",
+        "https://cdn.discordapp.com/attachments/1563582986174205972/",
+        "https://cdn.discordapp.com/ephemeral-attachments/1563582986174205972/"
+    ];
 
     let allUrls = []
 
